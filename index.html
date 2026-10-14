@@ -227,37 +227,29 @@
             });
         });
 
-        function processMagicTime(array) {
-            let h1 = array[0];
-            let h2 = array[1];
-            let m1 = array[2];
-            let m2 = array[3];
-            
-            let rawHour = parseInt(h1 + h2);
-            let rawMin = m1 + m2;
-            
-            // Auto-convert standard military/24hr touches cleanly to standard 12hr display
-            if (rawHour === 0) {
-                finalHour = "12";
-                finalAmPm = "AM";
-            } else if (rawHour > 12) {
-                finalHour = (rawHour - 12).toString().padStart(2, '0');
-                finalAmPm = "PM";
-            } else {
-                finalHour = rawHour.toString().padStart(2, '0');
-                finalAmPm = (rawHour === 12) ? "PM" : "AM";
+        // Remove your existing .ios-switch event listener block and paste this complete version:
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleSwitch = document.querySelector('.ios-switch');
+            const alarmRow = document.getElementById('magic-alarm-row');
+        
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('touchstart', function(e) {
+                    e.preventDefault(); // Prevents touch ghosting and Safari scrolling lag
+                    
+                    // Toggle the visual green switch state on screen
+                    if (alarmRow) {
+                        alarmRow.classList.toggle('activated');
+                    }
+                    
+                    // Format the precise payload
+                    let timePayload = `${finalHour}:${finalMinute} ${finalAmPm}`;
+                    let encodedTime = encodeURIComponent(timePayload);
+                    
+                    // Execute the system redirect cleanly without delays
+                    window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=${encodedTime}`;
+                });
             }
-            
-            finalMinute = rawMin;
-            
-            // Quietly inject into hidden app dashboard array
-            document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
-            document.getElementById('display-ampm').innerText = finalAmPm;
-
-            document.querySelector('.ios-switch').addEventListener('click', function() {
-                window.location.href = "shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=" + encodeURIComponent(`${finalHour}:${finalMinute}`);
-            });
-        }
+        });
 
         // Swipe Up Trigger: Slide up anywhere outside the grids to switch views
         let startY = 0;
