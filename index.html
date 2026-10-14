@@ -123,6 +123,8 @@
             border-radius: 16px;
             transition: background-color 0.2s;
             cursor: pointer;
+            pointer-events: auto !important; /* Forces iOS to register the touch */
+            z-index: 999; /* Places it safely on top of all other design layers */
         }
         .ios-switch::after {
             content: '';
