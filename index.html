@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clock</title>
+    <style>
+        /* Base styles to mimic an iPhone screen app layout */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* SCREEN 1: Fake Lock Screen (The Stealth Input Stage) */
+        #lock-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 60px 20px;
+            z-index: 10;
+            background: #000000; /* You can replace this with a dark wallpaper URL */
+        }
+        .lock-time {
+            color: #ffffff;
+            font-size: 72px;
+            font-weight: 200;
+            letter-spacing: -1px;
+            margin-top: 20px;
+        }
+        .lock-date {
+            color: #ffffff;
+            font-size: 19px;
+            font-weight: 400;
+            margin-top: -10px;
+            opacity: 0.9;
+        }
+        
+        /* The Secret 10-Section Input Grid */
+        #secret-grid {
+            position: absolute;
+            bottom: 120px; /* Positioned right where your thumb naturally rests */
+            left: 0;
+            width: 100%;
+            height: 150px; /* Tall enough to hit easily, low enough to remain hidden */
+            display: flex;
+            opacity: 0; /* Change to 0.1 during testing to see the hitboxes, keep 0 for performance */
+            z-index: 20;
+        }
+        .grid-segment {
+            flex: 1;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2); /* Tint visible only if opacity parent > 0 */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* SCREEN 2: The Magic "Clock App" Reveal Screen */
+        #app-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: none;
+            flex-direction: column;
+            padding: 40px 20px;
+            z-index: 5;
+        }
+        .app-header {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 0.5px solid #222;
+        }
+        .alarm-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 0.5px solid #222;
+        }
+        .alarm-time-container {
+            display: flex;
+            align-items: baseline;
+        }
+        .alarm-time {
+            color: #8e8e93; /* Dimmed state by default until activated */
+            font-size: 54px;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+        .alarm-ampm {
+            color: #8e8e93;
+            font-size: 24px;
+            margin-left: 5px;
+        }
+        .alarm-label {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-top: -5px;
+        }
+        
+        /* Fake iOS Switch Toggle */
+        .ios-switch {
+            position: relative;
+            width: 51px;
+            height: 31px;
+            background-color: #39393d;
+            border-radius: 16px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .ios-switch::after {
+            content: '';
+            position: absolute;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Active Reveal States */
+        .activated .alarm-time, .activated .alarm-ampm {
+            color: #ffffff;
+        }
+        .activated .ios-switch {
+            background-color: #34c759;
+        }
+        .activated .ios-switch::after {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: Fake Lock Screen -->
+    <div id="lock-screen">
+        <div style="text-align: center;">
+            <div class="lock-date" id="current-date">Tuesday, October 13</div>
+            <div class="lock-time" id="current-time">09:41</div>
+        </div>
+
+        <!-- Hidden 10-segment sensor bar for thumb tapping -->
+        <div id="secret-grid">
+            <div class="grid-segment" data-num="1"></div>
+            <div class="grid-segment" data-num="2"></div>
+            <div class="grid-segment" data-num="3"></div>
+            <div class="grid-segment" data-num="4"></div>
+            <div class="grid-segment" data-num="5"></div>
+            <div class="grid-segment" data-num="6"></div>
+            <div class="grid-segment" data-num="7"></div>
+            <div class="grid-segment" data-num="8"></div>
+            <div class="grid-segment" data-num="9"></div>
+            <div class="grid-segment" data-num="0"></div>
+        </div>
+        
+        <div style="color: #ffffff; opacity: 0.4; font-size: 13px;">Swipe up to unlock</div>
+    </div>
+
+    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
+    <div id="app-screen">
+        <div class="app-header">Alarm</div>
+        <div class="alarm-row" id="magic-alarm-row">
+            <div>
+                <div class="alarm-time-container">
+                    <div class="alarm-time" id="display-time">07:00</div>
+                    <div class="alarm-ampm" id="display-ampm">AM</div>
+                </div>
+                <div class="alarm-label">Alarm</div>
+            </div>
+            <div class="ios-switch"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set dynamic date on the lockscreen to make it look active
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
+        
+        // Simple function to sync real device time to lockscreen background
+        function updateLockClock() {
+            const now = new Date();
+            let hours = now.getHours().toString().padStart(2, '0');
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+        }
+        updateLockClock();
+        setInterval(updateLockClock, 60000);
+
+        // Core Trick Variables
+        let digitsEntered = [];
+        let finalHour = "07";
+        let finalMinute = "00";
+        let finalAmPm = "AM";
+
+        // Listen for secret sequence entry on hidden zone bars
+        const segments = document.querySelectorAll('.grid-segment');
+        segments.forEach(segment => {
+            segment.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // Stop native zoom/scroll behaviors
+                
+                let pressedNum = this.getAttribute('data-num');
+                digitsEntered.push(pressedNum);
+                
+                // When 4 distinct steps have been logged
+                if (digitsEntered.length === 4) {
+                    processMagicTime(digitsEntered);
+                }
+            });
+        });
+
+        function processMagicTime(array) {
+            window.location.href = "shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=" + finalHour + finalMinute;
+            let h1 = array[0];
+            let h2 = array[1];
+            let m1 = array[2];
+            let m2 = array[3];
+            
+            let rawHour = parseInt(h1 + h2);
+            let rawMin = m1 + m2;
+            
+            // Auto-convert standard military/24hr touches cleanly to standard 12hr display
+            if (rawHour === 0) {
+                finalHour = "12";
+                finalAmPm = "AM";
+            } else if (rawHour > 12) {
+                finalHour = (rawHour - 12).toString().padStart(2, '0');
+                finalAmPm = "PM";
+            } else {
+                finalHour = rawHour.toString().padStart(2, '0');
+                finalAmPm = (rawHour === 12) ? "PM" : "AM";
+            }
+            
+            finalMinute = rawMin;
+            
+            // Quietly inject into hidden app dashboard array
+            document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
+            document.getElementById('display-ampm').innerText = finalAmPm;
+        }
+
+        // Swipe Up Trigger: Slide up anywhere outside the grids to switch views
+        let startY = 0;
+        document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
+            if(e.target.className !== 'grid-segment') {
+                startY = e.touches[0].clientY;
+            }
+        });
+
+        document.getElementById('lock-screen').addEventListener('touchend', (e) => {
+            if(e.target.className !== 'grid-segment') {
+                let endY = e.changedTouches[0].clientY;
+                if (startY - endY > 80) { // Registered solid swipe up gesture
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('app-screen').style.display = 'flex';
+                }
+            }
+        });
+
+        // Trigger Switch reveal activation state
+        document.querySelector('.ios-switch').addEventListener('click', function() {
+            document.getElementById('magic-alarm-row').classList.toggle('activated');
+        });
+    </script>
+</body>
+</html>
