@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Clock</title>
+    <!-- Adding Apple Mobile Web App tags to hide the Safari browser bar -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        /* Base styles to mimic an iPhone screen app layout */
         * {
             box-sizing: border-box;
             user-select: none;
@@ -17,11 +19,31 @@
             width: 100%;
             height: 100%;
             background-color: #000000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", SFProDisplay-Regular, Roboto, Helvetica, sans-serif;
             overflow: hidden;
         }
 
-        /* SCREEN 1: Fake Lock Screen (The Stealth Input Stage) */
+        /* FAKE STATUS BAR AT TOP */
+        .status-bar-mock {
+            position: absolute;
+            top: 14px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 32px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 15;
+        }
+        .status-right {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* SCREEN 1: Fake Lock Screen */
         #lock-screen {
             position: absolute;
             width: 100%;
@@ -30,44 +52,80 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 60px 20px;
+            padding: 60px 0 80px 0;
             z-index: 10;
-            background: #000000; /* You can replace this with a dark wallpaper URL */
+            background: #000000;
         }
-        .lock-time {
-            color: #ffffff;
-            font-size: 72px;
-            font-weight: 200;
-            letter-spacing: -1px;
-            margin-top: 20px;
+        .lock-header {
+            text-align: center;
+            margin-top: 25px;
         }
         .lock-date {
             color: #ffffff;
-            font-size: 19px;
-            font-weight: 400;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .lock-time {
+            color: #ffffff;
+            font-size: 96px;
+            font-weight: 700; /* Bold weight matching your real screenshot */
+            letter-spacing: -2px;
             margin-top: -10px;
-            opacity: 0.9;
+            line-height: 1.1;
         }
         
-        /* The Secret 10-Section Input Grid */
-        #secret-grid {
+        /* BOTTOM QUICK BUTTONS MOCK */
+        .bottom-actions {
             position: absolute;
-            bottom: 120px; /* Positioned right where your thumb naturally rests */
-            left: 0;
+            bottom: 45px;
             width: 100%;
-            height: 150px; /* Tall enough to hit easily, low enough to remain hidden */
             display: flex;
-            opacity: 0; /* Change to 0.1 during testing to see the hitboxes, keep 0 for performance */
-            z-index: 20;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 15;
         }
-        .grid-segment {
-            flex: 1;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.2); /* Tint visible only if opacity parent > 0 */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .circle-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .circle-btn svg {
+            fill: #ffffff;
+            width: 22px;
+            height: 22px;
         }
 
-        /* SCREEN 2: The Magic "Clock App" Reveal Screen */
+        /* FIXED KEYPAD OVERLAY */
+        #secret-pad {
+            position: absolute;
+            bottom: 140px; 
+            left: 5%;
+            width: 90%;
+            height: 240px; 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            opacity: 0; /* Change to 0.1 during testing to see layout, keep 0 for performance */
+            z-index: 25;
+        }
+        .pad-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* SCREEN 2: Fake Alarm Clock */
         #app-screen {
             position: absolute;
             width: 100%;
@@ -75,22 +133,20 @@
             background-color: #000000;
             display: none;
             flex-direction: column;
-            padding: 40px 20px;
+            padding: 60px 24px;
             z-index: 5;
         }
         .app-header {
             color: #ffffff;
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 0.5px solid #222;
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 25px;
         }
         .alarm-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 0.5px solid #222;
         }
         .alarm-time-container {
@@ -98,33 +154,26 @@
             align-items: baseline;
         }
         .alarm-time {
-            color: #8e8e93; /* Dimmed state by default until activated */
-            font-size: 54px;
+            color: #ffffff;
+            font-size: 56px;
             font-weight: 300;
-            transition: color 0.3s ease;
         }
         .alarm-ampm {
-            color: #8e8e93;
+            color: #ffffff;
             font-size: 24px;
-            margin-left: 5px;
+            margin-left: 4px;
         }
         .alarm-label {
             color: #8e8e93;
             font-size: 14px;
-            margin-top: -5px;
+            margin-top: -4px;
         }
-        
-        /* Fake iOS Switch Toggle */
         .ios-switch {
-            position: relative;
             width: 51px;
             height: 31px;
-            background-color: #39393d;
+            background-color: #34c759; /* Default to on/green to look active */
             border-radius: 16px;
-            transition: background-color 0.2s;
-            cursor: pointer;
-            pointer-events: auto !important; /* Forces iOS to register the touch */
-            z-index: 999; /* Places it safely on top of all other design layers */
+            position: relative;
         }
         .ios-switch::after {
             content: '';
@@ -134,53 +183,69 @@
             border-radius: 50%;
             background-color: #ffffff;
             top: 2px;
-            left: 2px;
-            transition: transform 0.2s;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            right: 2px;
         }
-        
-        /* Active Reveal States */
-        .activated .alarm-time, .activated .alarm-ampm {
-            color: #ffffff;
-        }
-        .activated .ios-switch {
-            background-color: #34c759;
-        }
-        .activated .ios-switch::after {
-            transform: translateX(20px);
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 5px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            z-index: 30;
         }
     </style>
 </head>
 <body>
 
+    <!-- Mock Status Bar info -->
+    <div class="status-bar-mock" id="mock-status">
+        <div>Koodo</div>
+        <div class="status-right">
+            <!-- Mock icons layout representing signal, wifi, and battery -->
+            <span>📶</span><span>📶</span><span>62%</span>
+        </div>
+    </div>
+
     <!-- SCREEN 1: Fake Lock Screen -->
     <div id="lock-screen">
-        <div style="text-align: center;">
-            <div class="lock-date" id="current-date">Tuesday, October 13</div>
-            <div class="lock-time" id="current-time">09:41</div>
+        <div class="lock-header">
+            <div class="lock-date" id="current-date">Tue, Oct 13</div>
+            <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- Hidden 10-segment sensor bar for thumb tapping -->
-        <div id="secret-grid">
-            <div class="grid-segment" data-num="1"></div>
-            <div class="grid-segment" data-num="2"></div>
-            <div class="grid-segment" data-num="3"></div>
-            <div class="grid-segment" data-num="4"></div>
-            <div class="grid-segment" data-num="5"></div>
-            <div class="grid-segment" data-num="6"></div>
-            <div class="grid-segment" data-num="7"></div>
-            <div class="grid-segment" data-num="8"></div>
-            <div class="grid-segment" data-num="9"></div>
-            <div class="grid-segment" data-num="0"></div>
+        <!-- 3x4 Matrix Numeric Keypad Map Grid -->
+        <div id="secret-pad">
+            <div class="pad-btn" data-num="1">1</div>
+            <div class="pad-btn" data-num="2">2</div>
+            <div class="pad-btn" data-num="3">3</div>
+            <div class="pad-btn" data-num="4">4</div>
+            <div class="pad-btn" data-num="5">5</div>
+            <div class="pad-btn" data-num="6">6</div>
+            <div class="pad-btn" data-num="7">7</div>
+            <div class="pad-btn" data-num="8">8</div>
+            <div class="pad-btn" data-num="9">9</div>
+            <div class="pad-btn" style="visibility: hidden;"></div>
+            <div class="pad-btn" data-num="0">0</div>
         </div>
         
-        <div style="color: #ffffff; opacity: 0.4; font-size: 13px;">Swipe up to unlock</div>
+        <div class="bottom-actions">
+            <div class="circle-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm1.5-6.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-4a1.5 1.5 0 0 1 3 0v4z"/></svg>
+            </div>
+            <div style="color: #ffffff; opacity: 0.6; font-size: 14px; margin-top: 15px;">Swipe up to unlock</div>
+            <div class="circle-btn">
+                <svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+            </div>
+        </div>
     </div>
 
     <!-- SCREEN 2: Fake Native Alarm Clock Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
-        <div class="alarm-row" id="magic-alarm-row">
+        <div class="alarm-row">
             <div>
                 <div class="alarm-time-container">
                     <div class="alarm-time" id="display-time">07:00</div>
@@ -192,88 +257,82 @@
         </div>
     </div>
 
+    <!-- Apple Home Swipe Indicator Line -->
+    <div class="home-indicator"></div>
+
     <script>
-        // Set dynamic date on the lockscreen to make it look active
-        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        // Update Live Date layout matching your device
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
         
-        // Simple function to sync real device time to lockscreen background
         function updateLockClock() {
             const now = new Date();
-            let hours = now.getHours().toString().padStart(2, '0');
+            let hours = now.getHours();
             let minutes = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+            // Formatted to match 12-hour display on your native main lockscreen
+            let standardHours = (hours % 12 === 0) ? 12 : hours % 12;
+            document.getElementById('current-time').innerText = `${standardHours}:${minutes}`;
         }
         updateLockClock();
-        setInterval(updateLockClock, 60000);
+        setInterval(updateLockClock, 10000);
 
-        // Core Trick Variables
+        // Change 2 Fix: Clear inputs and separate coordinates using a standard grid matrix
         let digitsEntered = [];
         let finalHour = "07";
         let finalMinute = "00";
         let finalAmPm = "AM";
 
-        // Listen for secret sequence entry on hidden zone bars
-        const segments = document.querySelectorAll('.grid-segment');
-        segments.forEach(segment => {
-            segment.addEventListener('touchstart', function(e) {
-                e.preventDefault(); // Stop native zoom/scroll behaviors
-                
-                let pressedNum = this.getAttribute('data-num');
-                digitsEntered.push(pressedNum);
-                
-                // When 4 distinct steps have been logged
-                if (digitsEntered.length === 4) {
-                    processMagicTime(digitsEntered);
+        const padButtons = document.querySelectorAll('.pad-btn');
+        padButtons.forEach(btn => {
+            btn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                let num = this.getAttribute('data-num');
+                if (num !== null) {
+                    digitsEntered.push(num);
+                    if (digitsEntered.length === 4) {
+                        processMagicTime(digitsEntered);
+                    }
                 }
             });
         });
 
-        // Remove your existing .ios-switch event listener block and paste this complete version:
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleSwitch = document.querySelector('.ios-switch');
-            const alarmRow = document.getElementById('magic-alarm-row');
-        
-            if (toggleSwitch) {
-                toggleSwitch.addEventListener('touchstart', function(e) {
-                    e.preventDefault(); // Prevents touch ghosting and Safari scrolling lag
-                    
-                    // Toggle the visual green switch state on screen
-                    if (alarmRow) {
-                        alarmRow.classList.toggle('activated');
-                    }
-                    
-                    // Format the precise payload
-                    let timePayload = `${finalHour}:${finalMinute} ${finalAmPm}`;
-                    let encodedTime = encodeURIComponent(timePayload);
-                    
-                    // Execute the system redirect cleanly without delays
-                    window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=${encodedTime}`;
-                });
+        function processMagicTime(array) {
+            let rawHour = parseInt(array[0] + array[1]);
+            let rawMin = array[2] + array[3];
+            if (rawHour === 0 || rawHour === 12) {
+                finalHour = "12";
+                finalAmPm = "AM";
+            } else if (rawHour > 12) {
+                finalHour = (rawHour - 12).toString().padStart(2, '0');
+                finalAmPm = "PM";
+            } else {
+                finalHour = rawHour.toString().padStart(2, '0');
+                finalAmPm = "AM";
             }
-        });
+            finalMinute = rawMin;
+            document.getElementById('display-time').innerText = ${finalHour}:${finalMinute};
+            document.getElementById('display-ampm').innerText = finalAmPm;
+        }
 
-        // Swipe Up Trigger: Slide up anywhere outside the grids to switch views
+        // Standard Swipe Up Handler Configuration
         let startY = 0;
-        document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
-            if(e.target.className !== 'grid-segment') {
-                startY = e.touches[0].clientY;
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        });
+        document.addEventListener('touchend', (e) => {
+            let endY = e.changedTouches[0].clientY;
+            // Ignore small movements so clicking numbers doesn't trigger swipe unlocks
+            if (startY - endY > 100) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('mock-status').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'flex';
             }
         });
 
-        document.getElementById('lock-screen').addEventListener('touchend', (e) => {
-            if(e.target.className !== 'grid-segment') {
-                let endY = e.changedTouches[0].clientY;
-                if (startY - endY > 80) { // Registered solid swipe up gesture
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('app-screen').style.display = 'flex';
-                }
-            }
-        });
-
-        // Trigger Switch reveal activation state
-        document.querySelector('.ios-switch').addEventListener('click', function() {
-            document.getElementById('magic-alarm-row').classList.toggle('activated');
+        // Simple Toggle Behavior Handler
+        document.querySelector('.ios-switch').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = this.style.backgroundColor === 'rgb(57, 57, 61)' ? '#34c759' : '#39393d';
         });
     </script>
 </body>
