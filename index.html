@@ -255,18 +255,7 @@
             document.getElementById('display-ampm').innerText = finalAmPm;
 
             document.querySelector('.ios-switch').addEventListener('click', function() {
-                let row = document.getElementById('magic-alarm-row');
-                row.classList.toggle('activated');
-                
-                if (row.classList.contains('activated')) {
-                    setTimeout(() => {
-                        // Apple requires 'input=text' combined with the '&text=' parameters to pass strings from a browser
-                        let timeString = `${finalHour}:${finalMinute}`;
-                        let encodedTime = encodeURIComponent(timeString);
-                        
-                        window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=${encodedTime}`;
-                    }, 150);
-                }
+                window.location.href = "shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=" + encodeURIComponent(`${finalHour}:${finalMinute}`);
             });
         }
 
