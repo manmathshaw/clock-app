@@ -228,7 +228,6 @@
         });
 
         function processMagicTime(array) {
-            window.location.href = "shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=" + finalHour + finalMinute;
             let h1 = array[0];
             let h2 = array[1];
             let m1 = array[2];
@@ -254,6 +253,20 @@
             // Quietly inject into hidden app dashboard array
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
+
+            document.querySelector('.ios-switch').addEventListener('click', function() {
+                let row = document.getElementById('magic-alarm-row');
+                row.classList.toggle('activated');
+                
+                // Only launch the system shortcut if the switch is being turned ON
+                if (row.classList.contains('activated')) {
+                    setTimeout(() => {
+                        // Encode the string cleanly for safe URL data passage
+                        let urlTime = encodeURIComponent(`${finalHour}:${finalMinute} ${finalAmPm}`);
+                        window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=${urlTime}`;
+                    }, 300);
+                }
+            });
         }
 
         // Swipe Up Trigger: Slide up anywhere outside the grids to switch views
