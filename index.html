@@ -258,13 +258,14 @@
                 let row = document.getElementById('magic-alarm-row');
                 row.classList.toggle('activated');
                 
-                // Only launch the system shortcut if the switch is being turned ON
                 if (row.classList.contains('activated')) {
                     setTimeout(() => {
-                        // Encode the string cleanly for safe URL data passage
-                        let urlTime = encodeURIComponent(`${finalHour}:${finalMinute} ${finalAmPm}`);
-                        window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=${urlTime}`;
-                    }, 300);
+                        // Apple requires 'input=text' combined with the '&text=' parameters to pass strings from a browser
+                        let timeString = `${finalHour}:${finalMinute}`;
+                        let encodedTime = encodeURIComponent(timeString);
+                        
+                        window.location.href = `shortcuts://run-shortcut?name=Set%20Trick%20Alarm&input=text&text=${encodedTime}`;
+                    }, 150);
                 }
             });
         }
