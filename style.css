@@ -72,6 +72,7 @@ body, html {
     z-index: 50;
     background: rgba(0, 0, 0, 0.001); /* Explicitly forces browser layout tracking engine to listen */
     pointer-events: auto !important;
+    opacity: 0.15;
 }
 .pad-btn {
     background: rgba(255, 255, 255, 0.005); 
