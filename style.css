@@ -13,27 +13,6 @@ body, html {
     overflow: hidden;
 }
 
-/* FIXED MOCK STATUS BAR */
-.status-bar-mock {
-    position: absolute;
-    top: 14px;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 32px;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 600;
-    z-index: 100;
-    pointer-events: none;
-}
-.status-right {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
 /* CONTAINER SCREENS */
 #lock-screen {
     position: absolute;
@@ -62,7 +41,7 @@ body, html {
 /* TYPOGRAPHY CONFIGURATION */
 .lock-header {
     text-align: center;
-    margin-top: 25px;
+    margin-top: 45px;
     pointer-events: none;
 }
 .lock-date {
@@ -76,11 +55,11 @@ body, html {
     font-size: 96px;
     font-weight: 700;
     letter-spacing: -2px;
-    margin-top: -10px;
+    margin-top: -5px;
     line-height: 1.1;
 }
 
-/* FIXED BUG 1: SOLID TAP TRACKING KEYPAD MATRIX */
+/* TAP TRACKING KEYPAD MATRIX POSITIONING */
 #secret-pad {
     position: absolute;
     bottom: 160px; 
@@ -167,7 +146,7 @@ body, html {
     margin-top: -4px;
 }
 
-/* BUG 3 FIX: DYNAMIC REVEAL SWIFT TOGGLE */
+/* SLIDER SWITCH GRAPHICS */
 .ios-switch {
     width: 51px;
     height: 31px;
