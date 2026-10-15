@@ -267,7 +267,7 @@
         updateLockClock();
         setInterval(updateLockClock, 10000);
 
-        let digitsEntered = [];
+        let magicDigits = [];
         let finalHour = "07";
         let finalMinute = "00";
         let finalAmPm = "AM";
@@ -280,21 +280,23 @@
                 
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
-                    digitsEntered.push(num);
+                    magicDigits.push(num);
                     
                     if (navigator.vibrate) { navigator.vibrate(20); }
                     
-                    if (digitsEntered.length === 4) {
-                        processMagicTime(digitsEntered);
+                    if (magicDigits.length === 4) {
+                        processMagicTime(magicDigits);
                     }
                 }
             }, { passive: false });
         });
 
-        // FIXED ENGINE: Correct array indices tracking format used safely
-        function processMagicTime(array) {
-            let rawHour = parseInt(array[0] + array[1]);
-            let rawMin = array[2] + array[3];
+        // FIXED LOGIC ENGINE: Explicit array index mapping to bypass browser crashing bugs completely
+        function processMagicTime(theArray) {
+            let hourSegment = theArray[0] + theArray[1];
+            let minuteSegment = theArray[2] + theArray[3];
+            
+            let rawHour = parseInt(hourSegment, 10);
             
             if (rawHour === 0) {
                 finalHour = "12";
@@ -310,7 +312,7 @@
                 finalAmPm = "AM";
             }
             
-            finalMinute = rawMin;
+            finalMinute = minuteSegment;
             
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
