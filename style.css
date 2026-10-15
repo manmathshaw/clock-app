@@ -59,33 +59,41 @@ body, html {
     line-height: 1.1;
 }
 
-/* ADJUSTED FOR PRACTICE: CHANGED OPACITY TO 0.15 TO REVEAL KEYPAD GRID */
+/* MODIFIED RIGHT-HAND CONSOLE LAYOUT KEYPAD */
 #secret-pad {
     position: absolute;
-    bottom: 160px; 
-    left: 5%;
-    width: 90%;
-    height: 280px; 
+    bottom: 155px; 
+    right: 4%; /* Anchored cleanly to the right side edge */
+    width: 48%; /* Restructured horizontally to span only the right half */
+    height: 220px; 
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(4, 1fr); /* 4 horizontal columns to fit the wide bottom row */
+    gap: 10px;
     z-index: 50;
     background: transparent;
     pointer-events: auto !important;
-    opacity: 0.15; /* Forces the entire keypad array block to appear faintly on your wallpaper */
+    opacity: 0.15; /* Practice layout opacity tracker */
 }
 
 .pad-btn {
-    background: rgba(255, 0, 0, 0.4); /* Faint red fill color added inside the alignment blocks */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Soft borders to help visually map button fields */
-    border-radius: 12px;
+    background: rgba(255, 0, 0, 0.4); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* Sets digit text white inside the training templates */
-    font-size: 24px;
+    color: #ffffff; 
+    font-size: 18px;
     font-weight: bold;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* KEYPAD STRUCTURAL OVERRIDES TO BALANCE ROW SPACES */
+.r1-btn, .r2-btn {
+    grid-column: span 1.33; /* Balances 3 buttons nicely over a 4-column foundation */
+}
+.r3-btn {
+    grid-column: span 1; /* Maps 1 button space perfectly across the wide bottom line */
 }
 
 /* LOWER HARDWARE DECORATIONS */
