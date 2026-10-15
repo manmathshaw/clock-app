@@ -59,7 +59,7 @@ body, html {
     line-height: 1.1;
 }
 
-/* TAP TRACKING KEYPAD MATRIX POSITIONING */
+/* HIGHER RESPONSE HIDDEN CLICK LAYER MAP */
 #secret-pad {
     position: absolute;
     bottom: 160px; 
@@ -70,7 +70,7 @@ body, html {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     z-index: 50;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.001); /* Explicitly forces browser layout tracking engine to listen */
     pointer-events: auto !important;
 }
 .pad-btn {
@@ -146,7 +146,7 @@ body, html {
     margin-top: -4px;
 }
 
-/* SLIDER SWITCH GRAPHICS */
+/* SLIDER SWITCH ANIMATIONS */
 .ios-switch {
     width: 51px;
     height: 31px;
@@ -171,6 +171,7 @@ body, html {
     background-color: #34c759 !important;
 }
 .activated::after {
+    transform: transform 0.2s ease;
     transform: translateX(20px);
 }
 
