@@ -17,7 +17,7 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- Invisible Keypad Grid Map -->
+        <!-- 3x4 Matrix Invisible Keypad Overlay Layer -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Fake Alarm Face -->
+    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
         <div class="alarm-row">
@@ -54,7 +54,8 @@
                 </div>
                 <div class="alarm-label">Alarm</div>
             </div>
-            <div class="ios-switch" id="magic-toggle"></div>
+            <!-- Added the activated class here directly so it starts out green -->
+            <div class="ios-switch activated" id="magic-toggle"></div>
         </div>
     </div>
 
@@ -83,7 +84,7 @@
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
-                e.stopPropagation(); 
+                e.stopPropagation(); // Stops touch conflicts with the swipe tracker
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
                     digitsEntered.push(num);
@@ -91,10 +92,10 @@
                         processMagicTime(digitsEntered);
                     }
                 }
-            });
+            }, { passive: false });
         });
 
-        // FIXED SCRIPT COMPILING: Array processing fixed to avoid system freezing errors
+        // FIXED ENGINE: Corrected string concatenation syntax to stop system crashing
         function processMagicTime(array) {
             let h1 = array[0];
             let h2 = array[1];
@@ -123,21 +124,21 @@
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // Forces toggle switch green instantly by default
+            // Ensures the switch is forced on green by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
-        // Clean Swipe Velocity Upward Processing
+        // FIXED SWIPE UP TRACKER: Responsive velocity movement handler
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
-            startY = e.touches.clientY;
+            startY = e.touches[0].clientY;
         }, { passive: true });
 
         document.getElementById('lock-screen').addEventListener('touchend', (e) => {
-            let endY = e.changedTouches.clientY;
+            let endY = e.changedTouches[0].clientY;
             let swipeDistance = startY - endY;
             
-            if (swipeDistance > 70) { 
+            if (swipeDistance > 60) { 
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'flex';
             }
