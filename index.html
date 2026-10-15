@@ -1,13 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Clock</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
-    <!-- SCREEN 1: Fake Lock Screen -->
+    <!-- SCREEN 1: Fake Lock Screen (Status Bar Block Removed) -->
     <div id="lock-screen">
         <div class="lock-header">
             <div class="lock-date" id="current-date">Tue, Oct 13</div>
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- Stable Standard 3x4 Matrix (Visually condensed to right half via style.css) -->
+        <!-- 3x4 Matrix Invisible Keypad Overlay Layer -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -33,7 +43,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Fake Alarm Face -->
+    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
         <div class="alarm-row">
@@ -44,7 +54,8 @@
                 </div>
                 <div class="alarm-label">Alarm</div>
             </div>
-            <div class="ios-switch" id="magic-toggle"></div>
+            <!-- Added the activated class here directly so it starts out green -->
+            <div class="ios-switch activated" id="magic-toggle"></div>
         </div>
     </div>
 
@@ -73,7 +84,7 @@
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
-                e.stopPropagation(); 
+                e.stopPropagation(); // Stops touch conflicts with the swipe tracker
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
                     digitsEntered.push(num);
@@ -81,15 +92,18 @@
                         processMagicTime(digitsEntered);
                     }
                 }
-            });
+            }, { passive: false });
         });
 
-        // RESTORED STABLE DEVIATION: Standard calculation array processing methods reinstated cleanly
+        // FIXED ENGINE: Corrected string concatenation syntax to stop system crashing
         function processMagicTime(array) {
-            let hourStr = String(array[0]) + String(array[1]);
-            let minStr = String(array[2]) + String(array[3]);
+            let h1 = array[0];
+            let h2 = array[1];
+            let m1 = array[2];
+            let m2 = array[3];
             
-            let rawHour = parseInt(hourStr, 10);
+            let rawHour = parseInt(h1 + h2);
+            let rawMin = m1 + m2;
             
             if (rawHour === 0) {
                 finalHour = "12";
@@ -105,23 +119,23 @@
                 finalAmPm = "AM";
             }
             
-            finalMinute = minStr;
+            finalMinute = rawMin;
             
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // Automatically flips the alarm slider switch to green ON
+            // Ensures the switch is forced on green by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
-        // SWIPE MANAGER
+        // FIXED SWIPE UP TRACKER: Responsive velocity movement handler
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
-            startY = e.touches.clientY;
+            startY = e.touches[0].clientY;
         }, { passive: true });
 
         document.getElementById('lock-screen').addEventListener('touchend', (e) => {
-            let endY = e.changedTouches.clientY;
+            let endY = e.changedTouches[0].clientY;
             let swipeDistance = startY - endY;
             
             if (swipeDistance > 60) { 
