@@ -22,7 +22,7 @@
             overflow: hidden;
         }
 
-        /* SCREEN CARDS */
+        /* SCREENS */
         #lock-screen {
             position: absolute;
             width: 100%;
@@ -47,7 +47,7 @@
             z-index: 5;
         }
 
-        /* CLOCK LAYOUT TYPOGRAPHY */
+        /* TYPOGRAPHY */
         .lock-header {
             text-align: center;
             pointer-events: none;
@@ -67,7 +67,7 @@
             line-height: 1.1;
         }
 
-        /* SECRET GRID MATRIX OVERLAY */
+        /* SECRET PAD MATRIX LAYER */
         #secret-pad {
             position: absolute;
             bottom: 160px; 
@@ -80,7 +80,7 @@
             z-index: 50;
             pointer-events: auto !important;
             
-            /* PRACTICE MODE: Change to 0.2 to make the red boxes visible! Set to 0.0 to hide them completely when performing. */
+            /* TRAINING MODE: Keep at 0.2 to see where the buttons live! Change to 0.0 to hide them when performing. */
             opacity: 0.2; 
         }
         .pad-btn {
@@ -96,7 +96,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* HARDWARE GRAPHICAL ACCENTS */
+        /* ACCENTS */
         .bottom-actions {
             position: absolute;
             bottom: 45px;
@@ -124,7 +124,7 @@
             height: 22px;
         }
 
-        /* ALARM GRAPHICS PAGE */
+        /* ALARM GRAPHICS */
         .app-header {
             color: #ffffff;
             font-size: 34px;
@@ -158,7 +158,7 @@
             margin-top: -4px;
         }
 
-        /* NATIVE SLIDER SWITCH TOGGLE */
+        /* SWITCH SLIDER */
         .ios-switch {
             width: 51px;
             height: 31px;
@@ -209,7 +209,7 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Numerical Matrix Grid Array -->
+        <!-- 3x4 Matrix Invisible Pad Interface -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -272,7 +272,6 @@
         let finalMinute = "00";
         let finalAmPm = "AM";
 
-        // Touch capture setup
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
@@ -283,7 +282,6 @@
                 if (num !== null) {
                     digitsEntered.push(num);
                     
-                    // Hardware vibration pulse feedback
                     if (navigator.vibrate) { navigator.vibrate(20); }
                     
                     if (digitsEntered.length === 4) {
@@ -293,14 +291,11 @@
             }, { passive: false });
         });
 
+        // FIXED ENGINE: Correct array indices tracking format used safely
         function processMagicTime(array) {
-            let h1 = array[0];
-            let h2 = array[1];
-            let m1 = array[2];
-            let m2 = array[3];
+            let rawHour = parseInt(array[0] + array[1]);
+            let rawMin = array[2] + array[3];
             
-            let rawHour = parseInt(h1 + h2);
-            let rawMin = m1 + m2;
             if (rawHour === 0) {
                 finalHour = "12";
                 finalAmPm = "AM";
@@ -320,11 +315,10 @@
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // Turn the alarm switch green instantly by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
-        // SWIPE-UP ENGINE TRACKER
+        // SWIPE MANAGER
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
             startY = e.touches.clientY;
