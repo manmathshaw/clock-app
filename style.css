@@ -63,8 +63,8 @@ body, html {
 #secret-pad {
     position: absolute;
     bottom: 160px; 
-    left: 5%;
-    width: 90%;
+    right: 5%;
+    width: 45%;
     height: 280px; 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
