@@ -59,7 +59,7 @@ body, html {
     line-height: 1.1;
 }
 
-/* HIGHER RESPONSE HIDDEN CLICK LAYER MAP */
+/* ADJUSTED FOR PRACTICE: CHANGED OPACITY TO 0.15 TO REVEAL KEYPAD GRID */
 #secret-pad {
     position: absolute;
     bottom: 160px; 
@@ -70,17 +70,21 @@ body, html {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     z-index: 50;
-    background: rgba(0, 0, 0, 0.001); /* Explicitly forces browser layout tracking engine to listen */
+    background: transparent;
     pointer-events: auto !important;
+    opacity: 0.15; /* Forces the entire keypad array block to appear faintly on your wallpaper */
 }
+
 .pad-btn {
-    background: rgba(255, 255, 255, 0.005); 
+    background: rgba(255, 0, 0, 0.4); /* Faint red fill color added inside the alignment blocks */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Soft borders to help visually map button fields */
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.0); 
+    color: #ffffff; /* Sets digit text white inside the training templates */
     font-size: 24px;
+    font-weight: bold;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -171,7 +175,6 @@ body, html {
     background-color: #34c759 !important;
 }
 .activated::after {
-    transform: transform 0.2s ease;
     transform: translateX(20px);
 }
 
