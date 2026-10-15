@@ -6,7 +6,199 @@
     <title>Clock</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, Helvetica, sans-serif;
+            overflow: hidden;
+        }
+
+        /* SCREEN CARDS */
+        #lock-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 80px 0;
+            z-index: 10;
+            background: #000000;
+            touch-action: none;
+        }
+        #app-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: none;
+            flex-direction: column;
+            padding: 60px 24px;
+            z-index: 5;
+        }
+
+        /* CLOCK LAYOUT TYPOGRAPHY */
+        .lock-header {
+            text-align: center;
+            pointer-events: none;
+        }
+        .lock-date {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .lock-time {
+            color: #ffffff;
+            font-size: 96px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-top: -5px;
+            line-height: 1.1;
+        }
+
+        /* SECRET GRID MATRIX OVERLAY */
+        #secret-pad {
+            position: absolute;
+            bottom: 160px; 
+            left: 5%;
+            width: 90%;
+            height: 280px; 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            z-index: 50;
+            pointer-events: auto !important;
+            
+            /* PRACTICE MODE: Change to 0.2 to make the red boxes visible! Set to 0.0 to hide them completely when performing. */
+            opacity: 0.2; 
+        }
+        .pad-btn {
+            background: rgba(255, 0, 0, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff; 
+            font-size: 24px;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* HARDWARE GRAPHICAL ACCENTS */
+        .bottom-actions {
+            position: absolute;
+            bottom: 45px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 15;
+            pointer-events: none;
+        }
+        .circle-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .circle-btn svg {
+            fill: #ffffff;
+            width: 22px;
+            height: 22px;
+        }
+
+        /* ALARM GRAPHICS PAGE */
+        .app-header {
+            color: #ffffff;
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+        .alarm-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 0.5px solid #222;
+        }
+        .alarm-time-container {
+            display: flex;
+            align-items: baseline;
+        }
+        .alarm-time {
+            color: #ffffff;
+            font-size: 56px;
+            font-weight: 300;
+        }
+        .alarm-ampm {
+            color: #ffffff;
+            font-size: 24px;
+            margin-left: 4px;
+        }
+        .alarm-label {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-top: -4px;
+        }
+
+        /* NATIVE SLIDER SWITCH TOGGLE */
+        .ios-switch {
+            width: 51px;
+            height: 31px;
+            background-color: #39393d; 
+            border-radius: 16px;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+        .ios-switch::after {
+            content: '';
+            position: absolute;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+        }
+
+        .activated {
+            background-color: #34c759 !important;
+        }
+        .activated::after {
+            transform: translateX(20px);
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 5px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            z-index: 200;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,7 +209,7 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Matrix Telephone Grid Map Alignment Layout -->
+        <!-- 3x4 Numerical Matrix Grid Array -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -43,7 +235,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
+    <!-- SCREEN 2: Fake Alarm Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
         <div class="alarm-row">
@@ -61,6 +253,7 @@
     <div class="home-indicator"></div>
 
     <script>
+        // Update Live Date display
         const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', dateOptions);
         
@@ -79,18 +272,20 @@
         let finalMinute = "00";
         let finalAmPm = "AM";
 
+        // Touch capture setup
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
                 e.stopPropagation(); 
-                e.preventDefault();
+                e.preventDefault(); 
                 
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
-                    // Physical hardware pulse trigger let's you know tap succeeded
-                    if (navigator.vibrate) { navigator.vibrate(15); }
-                    
                     digitsEntered.push(num);
+                    
+                    // Hardware vibration pulse feedback
+                    if (navigator.vibrate) { navigator.vibrate(20); }
+                    
                     if (digitsEntered.length === 4) {
                         processMagicTime(digitsEntered);
                     }
@@ -99,7 +294,6 @@
         });
 
         function processMagicTime(array) {
-            // Converts internal array components cleanly to string strings
             let h1 = array[0];
             let h2 = array[1];
             let m1 = array[2];
@@ -107,7 +301,6 @@
             
             let rawHour = parseInt(h1 + h2);
             let rawMin = m1 + m2;
-            
             if (rawHour === 0) {
                 finalHour = "12";
                 finalAmPm = "AM";
@@ -127,13 +320,11 @@
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // Fires toggle switch state instantly upon completion sequence
+            // Turn the alarm switch green instantly by default
             document.getElementById('magic-toggle').classList.add('activated');
-            
-            // Give a double vibrate vibration pulse to signify 4 digits logged cleanly
-            if (navigator.vibrate) { navigator.vibrate([30, 50, 30]); }
         }
 
+        // SWIPE-UP ENGINE TRACKER
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
             startY = e.touches.clientY;
