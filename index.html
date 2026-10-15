@@ -6,26 +6,18 @@
     <title>Clock</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Links cleanly to your companion layout file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="status-bar-mock" id="mock-status">
-        <div>Koodo</div>
-        <div class="status-right">
-            <span>📶</span><span>📶</span><span>62%</span>
-        </div>
-    </div>
-
-    <!-- SCREEN 1: Fake Lock Screen -->
+    <!-- SCREEN 1: Fake Lock Screen (Status Bar Block Removed) -->
     <div id="lock-screen">
         <div class="lock-header">
             <div class="lock-date" id="current-date">Tue, Oct 13</div>
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Matrix Invisible Keypad Overlay Layer -->
+        <!-- Invisible Keypad Grid Map -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -51,7 +43,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
+    <!-- SCREEN 2: Fake Alarm Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
         <div class="alarm-row">
@@ -88,7 +80,6 @@
         let finalMinute = "00";
         let finalAmPm = "AM";
 
-        // BUG 1 FIXED: Touch tracking configurations
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
@@ -103,13 +94,22 @@
             });
         });
 
+        // FIXED SCRIPT COMPILING: Array processing fixed to avoid system freezing errors
         function processMagicTime(array) {
-            let rawHour = parseInt(array[0] + array[1]);
-            let rawMin = array[2] + array[3];
+            let h1 = array[0];
+            let h2 = array[1];
+            let m1 = array[2];
+            let m2 = array[3];
             
-            if (rawHour === 0 || rawHour === 12) {
+            let rawHour = parseInt(h1 + h2);
+            let rawMin = m1 + m2;
+            
+            if (rawHour === 0) {
                 finalHour = "12";
                 finalAmPm = "AM";
+            } else if (rawHour === 12) {
+                finalHour = "12";
+                finalAmPm = "PM";
             } else if (rawHour > 12) {
                 finalHour = (rawHour - 12).toString().padStart(2, '0');
                 finalAmPm = "PM";
@@ -123,11 +123,11 @@
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // BUG 3 FIXED: Force toggle switch green instantly when execution completes
+            // Forces toggle switch green instantly by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
-        // BUG 2 FIXED: Clean vertical scroll velocity tracking calculation
+        // Clean Swipe Velocity Upward Processing
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
             startY = e.touches.clientY;
@@ -139,12 +139,10 @@
             
             if (swipeDistance > 70) { 
                 document.getElementById('lock-screen').style.display = 'none';
-                document.getElementById('mock-status').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'flex';
             }
         });
 
-        // Toggle Switch override
         document.getElementById('magic-toggle').addEventListener('touchstart', function(e) {
             e.preventDefault();
             this.classList.toggle('activated');
