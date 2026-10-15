@@ -10,31 +10,38 @@
 </head>
 <body>
 
-    <!-- SCREEN 1: Fake Lock Screen (Status Bar Block Removed) -->
+    <!-- SCREEN 1: Fake Lock Screen -->
     <div id="lock-screen">
         <div class="lock-header">
             <div class="lock-date" id="current-date">Tue, Oct 13</div>
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Matrix Invisible Keypad Overlay Layer -->
+        <!-- Right-Handed 3-Row Numeric Matrix Grid Overlay Map -->
         <div id="secret-pad">
-            <div class="pad-btn" data-num="1">1</div>
-            <div class="pad-btn" data-num="2">2</div>
-            <div class="pad-btn" data-num="3">3</div>
-            <div class="pad-btn" data-num="4">4</div>
-            <div class="pad-btn" data-num="5">5</div>
-            <div class="pad-btn" data-num="6">6</div>
-            <div class="pad-btn" data-num="7">7</div>
-            <div class="pad-btn" data-num="8">8</div>
-            <div class="pad-btn" data-num="9">9</div>
-            <div class="pad-btn" style="visibility: hidden;"></div>
-            <div class="pad-btn" data-num="0">0</div>
+            <!-- Row 1: 0, 1, 2 -->
+            <div class="pad-btn r1-btn" data-num="0">0</div>
+            <div class="pad-btn r1-btn" data-num="1">1</div>
+            <div class="pad-btn r1-btn" data-num="2">2</div>
+            
+            <!-- Row 2: 3, 4, 5 -->
+            <div class="pad-btn r2-btn" data-num="3">3</div>
+            <div class="pad-btn r2-btn" data-num="4">4</div>
+            <div class="pad-btn r2-btn" data-num="5">5</div>
+            
+            <!-- Row 3: 6, 7, 8, 9 -->
+            <div class="pad-btn r3-btn" data-num="6">6</div>
+            <div class="pad-btn r3-btn" data-num="7">7</div>
+            <div class="pad-btn r3-btn" data-num="8">8</div>
+            <div class="pad-btn r3-btn" data-num="9">9</div>
         </div>
         
         <div class="bottom-actions">
+            <!-- CHANGED: Native Apple System Flashlight Icon Graphic Nodes Added -->
             <div class="circle-btn">
-                <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm1.5-6.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-4a1.5 1.5 0 0 1 3 0v4z"/></svg>
+                <svg viewBox="0 0 24 24" style="width:24px; height:24px;">
+                    <path d="M12 2A2 2 0 0 0 10 4v4h4V4a2 2 0 0 0-2-2zm-2 7v11a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9zm3.5 3.5a1 1 0 1 1 1-1 1 1 0 0 1-1 1z"/>
+                </svg>
             </div>
             <div style="color: #ffffff; opacity: 0.6; font-size: 14px; margin-top: 15px;">Swipe up to unlock</div>
             <div class="circle-btn">
@@ -54,15 +61,13 @@
                 </div>
                 <div class="alarm-label">Alarm</div>
             </div>
-            <!-- Added the activated class here directly so it starts out green -->
-            <div class="ios-switch activated" id="magic-toggle"></div>
+            <div class="ios-switch" id="magic-toggle"></div>
         </div>
     </div>
 
     <div class="home-indicator"></div>
 
     <script>
-        // Update Live Date display
         const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', dateOptions);
         
@@ -84,7 +89,7 @@
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
-                e.stopPropagation(); // Stops touch conflicts with the swipe tracker
+                e.stopPropagation(); 
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
                     digitsEntered.push(num);
@@ -92,17 +97,16 @@
                         processMagicTime(digitsEntered);
                     }
                 }
-            }, { passive: false });
+            });
         });
 
-        // FIXED ENGINE: Corrected string concatenation syntax to stop system crashing
         function processMagicTime(array) {
             let h1 = array[0];
             let h2 = array[1];
             let m1 = array[2];
             let m2 = array[3];
             
-            let rawHour = parseInt(h1 + h2);
+            let rawHour = parseInt(h1 + h2, 10);
             let rawMin = m1 + m2;
             
             if (rawHour === 0) {
@@ -124,18 +128,16 @@
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
-            // Ensures the switch is forced on green by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
-        // FIXED SWIPE UP TRACKER: Responsive velocity movement handler
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
+            startY = e.touches.clientY;
         }, { passive: true });
 
         document.getElementById('lock-screen').addEventListener('touchend', (e) => {
-            let endY = e.changedTouches[0].clientY;
+            let endY = e.changedTouches.clientY;
             let swipeDistance = startY - endY;
             
             if (swipeDistance > 60) { 
