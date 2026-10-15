@@ -209,7 +209,7 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Matrix Invisible Pad Interface -->
+        <!-- 3x4 Matrix Pad Interface -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -291,10 +291,10 @@
             }, { passive: false });
         });
 
-        // FIXED ENGINE: Explicitly parsing array position strings instead of combining objects
+        // FIXED CRITICAL ARRAYS BUG: Explicit index selection markers added [0],[1],[2],[3]
         function processMagicTime(theArray) {
-            let hourSegment = theArray[0] + theArray[1];
-            let minuteSegment = theArray[2] + theArray[3];
+            let hourSegment = String(theArray[0]) + String(theArray[1]);
+            let minuteSegment = String(theArray[2]) + String(theArray[3]);
             
             let rawHour = parseInt(hourSegment, 10);
             
