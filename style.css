@@ -59,30 +59,30 @@ body, html {
     line-height: 1.1;
 }
 
-/* REVERT FIX: Standard 3x4 layout shifted perfectly to the right half of the screen */
+/* ADJUSTED FOR PRACTICE: CHANGED OPACITY TO 0.15 TO REVEAL KEYPAD GRID */
 #secret-pad {
     position: absolute;
     bottom: 160px; 
-    right: 5%; /* Anchored to the right side edge */
-    width: 45%; /* Sized to occupy only the right half of the screen */
+    left: 5%;
+    width: 90%;
     height: 280px; 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 15px;
     z-index: 50;
     background: transparent;
     pointer-events: auto !important;
-    opacity: 0.15; /* Practice view indicator */
+    opacity: 0.15; /* Forces the entire keypad array block to appear faintly on your wallpaper */
 }
 
 .pad-btn {
-    background: rgba(255, 0, 0, 0.4); 
-    border: 1px solid rgba(255, 255, 255, 0.2); 
+    background: rgba(255, 0, 0, 0.4); /* Faint red fill color added inside the alignment blocks */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Soft borders to help visually map button fields */
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff; 
+    color: #ffffff; /* Sets digit text white inside the training templates */
     font-size: 24px;
     font-weight: bold;
     -webkit-tap-highlight-color: transparent;
