@@ -1,13 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Clock</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
 
     <!-- SCREEN 1: Fake Lock Screen -->
@@ -17,31 +7,24 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- Right-Handed 3-Row Numeric Matrix Grid Overlay Map -->
+        <!-- Stable Standard 3x4 Matrix (Visually condensed to right half via style.css) -->
         <div id="secret-pad">
-            <!-- Row 1: 0, 1, 2 -->
-            <div class="pad-btn r1-btn" data-num="0">0</div>
-            <div class="pad-btn r1-btn" data-num="1">1</div>
-            <div class="pad-btn r1-btn" data-num="2">2</div>
-            
-            <!-- Row 2: 3, 4, 5 -->
-            <div class="pad-btn r2-btn" data-num="3">3</div>
-            <div class="pad-btn r2-btn" data-num="4">4</div>
-            <div class="pad-btn r2-btn" data-num="5">5</div>
-            
-            <!-- Row 3: 6, 7, 8, 9 -->
-            <div class="pad-btn r3-btn" data-num="6">6</div>
-            <div class="pad-btn r3-btn" data-num="7">7</div>
-            <div class="pad-btn r3-btn" data-num="8">8</div>
-            <div class="pad-btn r3-btn" data-num="9">9</div>
+            <div class="pad-btn" data-num="1">1</div>
+            <div class="pad-btn" data-num="2">2</div>
+            <div class="pad-btn" data-num="3">3</div>
+            <div class="pad-btn" data-num="4">4</div>
+            <div class="pad-btn" data-num="5">5</div>
+            <div class="pad-btn" data-num="6">6</div>
+            <div class="pad-btn" data-num="7">7</div>
+            <div class="pad-btn" data-num="8">8</div>
+            <div class="pad-btn" data-num="9">9</div>
+            <div class="pad-btn" style="visibility: hidden;"></div>
+            <div class="pad-btn" data-num="0">0</div>
         </div>
         
         <div class="bottom-actions">
-            <!-- CHANGED: Native Apple System Flashlight Icon Graphic Nodes Added -->
             <div class="circle-btn">
-                <svg viewBox="0 0 24 24" style="width:24px; height:24px;">
-                    <path d="M12 2A2 2 0 0 0 10 4v4h4V4a2 2 0 0 0-2-2zm-2 7v11a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V9zm3.5 3.5a1 1 0 1 1 1-1 1 1 0 0 1-1 1z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm1.5-6.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-4a1.5 1.5 0 0 1 3 0v4z"/></svg>
             </div>
             <div style="color: #ffffff; opacity: 0.6; font-size: 14px; margin-top: 15px;">Swipe up to unlock</div>
             <div class="circle-btn">
@@ -50,7 +33,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: Fake Native Alarm Clock Face -->
+    <!-- SCREEN 2: Fake Alarm Face -->
     <div id="app-screen">
         <div class="app-header">Alarm</div>
         <div class="alarm-row">
@@ -68,6 +51,7 @@
     <div class="home-indicator"></div>
 
     <script>
+        // Update Live Date display
         const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', dateOptions);
         
@@ -100,14 +84,12 @@
             });
         });
 
+        // RESTORED STABLE DEVIATION: Standard calculation array processing methods reinstated cleanly
         function processMagicTime(array) {
-            let h1 = array[0];
-            let h2 = array[1];
-            let m1 = array[2];
-            let m2 = array[3];
+            let hourStr = String(array[0]) + String(array[1]);
+            let minStr = String(array[2]) + String(array[3]);
             
-            let rawHour = parseInt(h1 + h2, 10);
-            let rawMin = m1 + m2;
+            let rawHour = parseInt(hourStr, 10);
             
             if (rawHour === 0) {
                 finalHour = "12";
@@ -123,14 +105,16 @@
                 finalAmPm = "AM";
             }
             
-            finalMinute = rawMin;
+            finalMinute = minStr;
             
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
+            // Automatically flips the alarm slider switch to green ON
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
+        // SWIPE MANAGER
         let startY = 0;
         document.getElementById('lock-screen').addEventListener('touchstart', (e) => {
             startY = e.touches.clientY;
