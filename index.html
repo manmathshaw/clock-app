@@ -291,7 +291,7 @@
             }, { passive: false });
         });
 
-        // FIXED LOGIC ENGINE: Explicit array index mapping to bypass browser crashing bugs completely
+        // FIXED ENGINE: Explicitly parsing array position strings instead of combining objects
         function processMagicTime(theArray) {
             let hourSegment = theArray[0] + theArray[1];
             let minuteSegment = theArray[2] + theArray[3];
