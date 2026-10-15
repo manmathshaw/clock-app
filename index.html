@@ -22,7 +22,7 @@
             overflow: hidden;
         }
 
-        /* SCREENS */
+        /* SCREEN CARDS */
         #lock-screen {
             position: absolute;
             width: 100%;
@@ -47,7 +47,7 @@
             z-index: 5;
         }
 
-        /* TYPOGRAPHY */
+        /* CLOCK LAYOUT TYPOGRAPHY */
         .lock-header {
             text-align: center;
             pointer-events: none;
@@ -67,7 +67,7 @@
             line-height: 1.1;
         }
 
-        /* SECRET PAD MATRIX LAYER */
+        /* SECRET GRID MATRIX OVERLAY */
         #secret-pad {
             position: absolute;
             bottom: 160px; 
@@ -80,8 +80,8 @@
             z-index: 50;
             pointer-events: auto !important;
             
-            /* TRAINING MODE: Keep at 0.2 to see where the buttons live! Change to 0.0 to hide them when performing. */
-            opacity: 0.2; 
+            /* REVERT FIX: Restored to 0.15 opacity for high performance practice targeting */
+            opacity: 0.15; 
         }
         .pad-btn {
             background: rgba(255, 0, 0, 0.6); 
@@ -96,7 +96,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ACCENTS */
+        /* HARDWARE GRAPHICAL ACCENTS */
         .bottom-actions {
             position: absolute;
             bottom: 45px;
@@ -124,7 +124,7 @@
             height: 22px;
         }
 
-        /* ALARM GRAPHICS */
+        /* ALARM GRAPHICS PAGE */
         .app-header {
             color: #ffffff;
             font-size: 34px;
@@ -158,7 +158,7 @@
             margin-top: -4px;
         }
 
-        /* SWITCH SLIDER */
+        /* NATIVE SLIDER SWITCH TOGGLE */
         .ios-switch {
             width: 51px;
             height: 31px;
@@ -209,7 +209,7 @@
             <div class="lock-time" id="current-time">11:27</div>
         </div>
 
-        <!-- 3x4 Matrix Pad Interface -->
+        <!-- 3x4 Numerical Matrix Grid Array -->
         <div id="secret-pad">
             <div class="pad-btn" data-num="1">1</div>
             <div class="pad-btn" data-num="2">2</div>
@@ -267,36 +267,35 @@
         updateLockClock();
         setInterval(updateLockClock, 10000);
 
-        let magicDigits = [];
+        let digitsEntered = [];
         let finalHour = "07";
         let finalMinute = "00";
         let finalAmPm = "AM";
 
+        // REVERTED TOUCH BLOCK: Restored to original stable working input collection framework
         const padButtons = document.querySelectorAll('.pad-btn');
         padButtons.forEach(btn => {
             btn.addEventListener('touchstart', function(e) {
                 e.stopPropagation(); 
-                e.preventDefault(); 
-                
                 let num = this.getAttribute('data-num');
                 if (num !== null) {
-                    magicDigits.push(num);
-                    
-                    if (navigator.vibrate) { navigator.vibrate(20); }
-                    
-                    if (magicDigits.length === 4) {
-                        processMagicTime(magicDigits);
+                    digitsEntered.push(num);
+                    if (digitsEntered.length === 4) {
+                        processMagicTime(digitsEntered);
                     }
                 }
-            }, { passive: false });
+            });
         });
 
-        // FIXED CRITICAL ARRAYS BUG: Explicit index selection markers added [0],[1],[2],[3]
-        function processMagicTime(theArray) {
-            let hourSegment = String(theArray[0]) + String(theArray[1]);
-            let minuteSegment = String(theArray[2]) + String(theArray[3]);
+        // REVERTED LOGIC ENGINE: Restored exact working string logic pattern that bypasses system crashes
+        function processMagicTime(array) {
+            let h1 = array[0];
+            let h2 = array[1];
+            let m1 = array[2];
+            let m2 = array[3];
             
-            let rawHour = parseInt(hourSegment, 10);
+            let rawHour = parseInt(h1 + h2, 10);
+            let rawMin = m1 + m2;
             
             if (rawHour === 0) {
                 finalHour = "12";
@@ -312,11 +311,12 @@
                 finalAmPm = "AM";
             }
             
-            finalMinute = minuteSegment;
+            finalMinute = rawMin;
             
             document.getElementById('display-time').innerText = `${finalHour}:${finalMinute}`;
             document.getElementById('display-ampm').innerText = finalAmPm;
             
+            // Turn the alarm switch green instantly by default
             document.getElementById('magic-toggle').classList.add('activated');
         }
 
